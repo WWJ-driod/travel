@@ -1,0 +1,13 @@
+{
+  "name": "real-time-clock",
+  "version": "1.0.0",
+  "description": "实时时钟网页",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -s . -p 8080",
+    "dev": "npx http-server -p 8080"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}

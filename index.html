@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乡村旅游之家</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 50%, #388E3C 100%);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grass" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="%238BC34A"/><path d="M0,10 Q5,5 10,10 T20,10" stroke="%23688E3C" stroke-width="0.5" fill="none"/></pattern></defs><rect width="100" height="100" fill="url(%23grass)"/></svg>');
+        }
+        
+        .login-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 70px 45px;
+            border-radius: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            max-width: 450px;
+            width: 90%;
+            border: 2px solid rgba(121, 85, 72, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8BC34A, #4CAF50, #388E3C);
+        }
+        
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: #3E2723;
+            margin-bottom: 45px;
+            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #5D4037, #8BC34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-btn {
+            background: linear-gradient(45deg, #689F38, #558B2F);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.4rem;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(104, 159, 56, 0.4);
+            font-weight: bold;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(104, 159, 56, 0.6);
+            background: linear-gradient(45deg, #558B2F, #33691E);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #5D4037;
+            margin-bottom: 35px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+        
+        .current-time {
+            font-size: 1.9rem;
+            color: #5D4037;
+            margin: 30px 0;
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+        
+        .login-form {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #5D4037;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #8BC34A;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(139, 195, 74, 0.3);
+        }
+        
+        .form-input:focus {
+            border-color: #689F38;
+            box-shadow: 0 5px 18px rgba(139, 195, 74, 0.5);
+            outline: none;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .form-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .user-type-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        
+        .register-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .register-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        }
+        
+        .register-form {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .register-submit-btn {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .back-to-login-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="main-title">旅游者之家</div>
+        <div class="subtitle">欢迎来到旅游者的专属空间</div>
+        <button class="login-btn" id="loginButton">登录</button>
+        <button class="register-btn" id="registerButton">注册</button>
+        
+        <div class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名：</label>
+                <input type="text" id="username" class="form-input" placeholder="请输入用户名">
+            </div>
+            <div class="form-group">
+                <label for="password">密码：</label>
+                <input type="password" id="password" class="form-input" placeholder="请输入密码">
+            </div>
+            <div class="form-group">
+                <label for="userType">用户类型：</label>
+                <select id="userType" class="user-type-select">
+                    <option value="tourist">普通游客</option>
+                    <option value="village">村委</option>
+                    <option value="cooperative">合作社</option>
+                    <option value="enterprise">旅游企业</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="form-btn submit-btn" id="submitLogin">登录</button>
+                <button type="button" class="form-btn cancel-btn" id="cancelLogin">取消</button>
+            </div>
+        </div>
+        
+        <div class="register-form" id="registerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regUsername">用户名：</label>
+                    <input type="text" id="regUsername" class="form-input" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">邮箱：</label>
+                    <input type="email" id="regEmail" class="form-input" placeholder="请输入邮箱">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regPassword">密码：</label>
+                    <input type="password" id="regPassword" class="form-input" placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">确认密码：</label>
+                    <input type="password" id="regConfirmPassword" class="form-input" placeholder="请再次输入密码">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="regUserType">用户类型：</label>
+                <select id="regUserType" class="user-type-select">
+                    <option value="tourist">普通游客</option>
+                    <option value="village">村委</option>
+                    <option value="cooperative">合作社</option>
+                    <option value="enterprise">旅游企业</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="regPhone">手机号：</label>
+                <input type="tel" id="regPhone" class="form-input" placeholder="请输入手机号">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="form-btn register-submit-btn" id="submitRegister">注册</button>
+                <button type="button" class="form-btn back-to-login-btn" id="backToLogin">返回登录</button>
+            </div>
+        </div>
+        
+        <div class="current-time" id="currentTime">00:00:00</div>
+    </div>
+
+    <script>
+        // 时间更新函数
+        function updateTime() {
+            const now = new Date();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[now.getDay()];
+            
+            const fullDateString = `${year}年${month}月${day}日`;
+            const weekdayString = `星期${weekday}`;
+            
+            document.getElementById('currentTime').innerHTML = 
+                `${timeString}<br>
+                <span style="font-size: 1rem; opacity: 0.9;">${fullDateString}</span><br>
+                <span style="font-size: 0.9rem; opacity: 0.8;">${weekdayString}</span>`;
+        }
+        
+        // 显示登录表单
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('username').focus();
+        }
+        
+        // 隐藏登录表单
+        function hideLoginForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('loginButton').style.display = 'block';
+            document.getElementById('registerButton').style.display = 'block';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('userType').value = 'tourist';
+        }
+        
+        // 显示注册表单
+        function showRegisterForm() {
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('registerButton').style.display = 'none';
+            document.getElementById('regUsername').focus();
+        }
+        
+        // 隐藏注册表单
+        function hideRegisterForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginButton').style.display = 'block';
+            document.getElementById('registerButton').style.display = 'block';
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+            document.getElementById('regUserType').value = 'tourist';
+            document.getElementById('regPhone').value = '';
+        }
+        
+        // 处理注册
+        function handleRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const userType = document.getElementById('regUserType').value;
+            const phone = document.getElementById('regPhone').value;
+            
+            // 验证必填字段
+            if (!username || !email || !password || !confirmPassword || !phone) {
+                alert('请填写所有必填字段！');
+                return;
+            }
+            
+            // 验证密码匹配
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致！');
+                document.getElementById('regConfirmPassword').value = '';
+                document.getElementById('regConfirmPassword').focus();
+                return;
+            }
+            
+            // 验证密码长度
+            if (password.length < 6) {
+                alert('密码长度至少为6位！');
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
+                document.getElementById('regPassword').focus();
+                return;
+            }
+            
+            // 验证邮箱格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('请输入有效的邮箱地址！');
+                document.getElementById('regEmail').focus();
+                return;
+            }
+            
+            // 验证手机号格式
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('请输入有效的手机号！');
+                document.getElementById('regPhone').focus();
+                return;
+            }
+            
+            // 检查用户名是否已存在
+            const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            if (existingUsers.some(user => user.username === username)) {
+                alert('用户名已存在，请选择其他用户名！');
+                document.getElementById('regUsername').focus();
+                return;
+            }
+            
+            // 注册成功
+            const newUser = {
+                username: username,
+                email: email,
+                password: password,
+                userType: userType,
+                phone: phone,
+                registerTime: new Date().toISOString()
+            };
+            
+            existingUsers.push(newUser);
+            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+            
+            alert(`注册成功！用户名：${username} 用户类型：${getUserTypeName(userType)}
+您现在可以使用该账户登录系统。`);
+            hideRegisterForm();
+        }
+        
+        // 获取用户类型名称
+        function getUserTypeName(userType) {
+            const typeMap = {
+                'tourist': '普通游客',
+                'village': '村委',
+                'cooperative': '合作社',
+                'enterprise': '旅游企业'
+            };
+            return typeMap[userType] || '未知类型';
+        }
+        
+        // 处理登录
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const selectedUserType = document.getElementById('userType').value;
+            
+            if (!username || !password) {
+                alert('请输入用户名和密码！');
+                return;
+            }
+            
+            // 村委账户登录
+            if (username === 'village' && password === '123456') {
+                if (selectedUserType !== 'village') {
+                    alert('村委账户必须选择"村委"用户类型！');
+                    document.getElementById('userType').focus();
+                    return;
+                }
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', selectedUserType);
+                window.location.href = 'map.html';
+                return;
+            }
+            
+            // 合作社账户登录
+            if (username === 'coop' && password === '123456') {
+                if (selectedUserType !== 'cooperative') {
+                    alert('合作社账户必须选择"合作社"用户类型！');
+                    document.getElementById('userType').focus();
+                    return;
+                }
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', selectedUserType);
+                window.location.href = 'map.html';
+                return;
+            }
+            
+            // 旅游企业账户登录
+            if (username === 'enterprise' && password === '123456') {
+                if (selectedUserType !== 'enterprise') {
+                    alert('旅游企业账户必须选择"旅游企业"用户类型！');
+                    document.getElementById('userType').focus();
+                    return;
+                }
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', selectedUserType);
+                window.location.href = 'map.html';
+                return;
+            }
+            
+            // 普通管理员账户
+            if (username === 'admin' && password === '123456') {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', selectedUserType);
+                window.location.href = 'map.html';
+                return;
+            }
+            
+            // 检查新注册用户
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            console.log('注册用户列表:', registeredUsers);
+            console.log('尝试登录的用户名:', username, '密码:', password);
+            
+            const user = registeredUsers.find(u => u.username === username && u.password === password);
+            console.log('找到的用户:', user);
+            
+            if (user) {
+                // 验证用户类型是否匹配
+                if (user.userType !== selectedUserType) {
+                    alert(`账户类型不匹配！该账户是${getUserTypeName(user.userType)}类型，请选择正确的用户类型。`);
+                    document.getElementById('userType').focus();
+                    return;
+                }
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userType', selectedUserType);
+                window.location.href = 'map.html';
+                return;
+            }
+            
+            // 登录失败
+            alert('用户名或密码错误！\n\n可用账户：\n- 演示账户：coop / 123456（合作社）\n- 演示账户：enterprise / 123456（旅游企业）\n- 演示账户：admin / 123456（任意类型）\n- 或使用您注册的新账户');
+            document.getElementById('password').value = '';
+            document.getElementById('password').focus();
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查登录状态
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username');
+            
+            // 更新时间
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // 绑定事件
+            document.getElementById('loginButton').addEventListener('click', showLoginForm);
+            document.getElementById('submitLogin').addEventListener('click', handleLogin);
+            document.getElementById('cancelLogin').addEventListener('click', hideLoginForm);
+            document.getElementById('registerButton').addEventListener('click', showRegisterForm);
+            document.getElementById('submitRegister').addEventListener('click', handleRegister);
+            document.getElementById('backToLogin').addEventListener('click', hideRegisterForm);
+            
+            // 如果已登录，更新界面
+            if (isLoggedIn === 'true' && username) {
+                document.querySelector('.subtitle').innerHTML = `欢迎回来，<strong>${username}</strong>！<br>您已成功登录旅游者之家`;
+                document.getElementById('loginButton').textContent = '退出登录';
+                document.getElementById('loginButton').onclick = function() {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('username');
+                    location.reload();
+                };
+            }
+        });
+    </script>
+</body>
+</html>

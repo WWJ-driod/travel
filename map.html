@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乡村旅游之家 - 田园风光地图</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 50%, #388E3C 100%);
+            min-height: 100vh;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="field" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse"><rect width="25" height="25" fill="%234CAF50"/><circle cx="12.5" cy="12.5" r="2" fill="%238BC34A" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23field)"/></svg>');
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-bottom: 3px solid rgba(121, 85, 72, 0.3);
+        }
+        
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #3E2723;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #5D4037, #8BC34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .welcome-text {
+            font-size: 1.3rem;
+            color: #5D4037;
+            margin: 15px 0 0 0;
+            font-weight: 500;
+        }
+        
+        .map-container {
+            margin: 30px auto;
+            max-width: 1400px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 35px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(121, 85, 72, 0.2);
+        }
+        
+        /* 新布局样式 */
+        .layout-container {
+            display: flex;
+            gap: 30px;
+            min-height: 600px;
+        }
+        
+        .map-section {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .spots-section {
+            flex: 1;
+            min-width: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 195, 74, 0.3);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .spots-section h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .spot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .spot-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        
+        .spot-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 195, 74, 0.3);
+        }
+        
+        .spot-item.active {
+            background: rgba(139, 195, 74, 0.3);
+            border-color: #8BC34A;
+        }
+        
+        .spot-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .spot-type {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        
+        .spot-description {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+        
+        .map-title {
+            font-size: 2.2rem;
+            color: #5D4037;
+            text-align: center;
+            margin-bottom: 35px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+        }
+        
+        /* 地图控制面板样式 */
+        .map-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #8BC34A;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 1.1rem;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #689F38;
+            box-shadow: 0 6px 20px rgba(139, 195, 74, 0.5);
+        }
+        
+        .search-btn {
+            background: linear-gradient(45deg, #689F38, #558B2F);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(104, 159, 56, 0.4);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(104, 159, 56, 0.6);
+            background: linear-gradient(45deg, #558B2F, #33691E);
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .zoom-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #8BC34A;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(139, 195, 74, 0.3);
+            color: #5D4037;
+            font-weight: bold;
+        }
+        
+        .zoom-btn:hover {
+            background: #8BC34A;
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 5px 18px rgba(139, 195, 74, 0.5);
+        }
+        
+        .zoom-level {
+            color: #5D4037;
+            font-weight: bold;
+            min-width: 70px;
+            text-align: center;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 地图画布样式 */
+        .map-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 3px solid #8BC34A;
+        }
+        
+        #mapCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        #mapCanvas:active {
+            cursor: grabbing;
+        }
+        
+        /* 地图图例样式 */
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        /* 景点信息面板 */
+        .spot-info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .spot-info-title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .spot-info-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(45deg, #D84315, #BF360C);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(215, 67, 21, 0.4);
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(215, 67, 21, 0.6);
+            background: linear-gradient(45deg, #BF360C, #8D6E63);
+        }
+        
+        .current-time {
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+        
+        /* 合作社菜单样式 */
+        .cooperative-menu {
+            margin: 30px 0;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .menu-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(139, 195, 74, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(139, 195, 74, 0.3);
+            border-color: rgba(139, 195, 74, 0.6);
+        }
+        
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .menu-item h3 {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        
+        .menu-item p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .map-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: none;
+            }
+            
+            .map-canvas-container {
+                height: 400px;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="main-title">旅游者之家</h1>
+        <div class="welcome-text" id="welcomeText">欢迎来到交互式旅游地图</div>
+    </div>
+    
+    <div class="map-container">
+        <h2 class="map-title">交互式旅游地图</h2>
+        
+        <!-- 地图控制面板 -->
+        <div class="map-controls">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索景点名称...">
+                <button class="search-btn" onclick="searchSpot()">搜索</button>
+            </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomOut()">-</button>
+                <span class="zoom-level" id="zoomLevel">5x</span>
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="search-btn" onclick="resetMap()" style="margin-left: 15px;">重置地图</button>
+                <button class="search-btn" onclick="clearUserMarkers()" style="margin-left: 15px; background: linear-gradient(45deg, #FF5252, #D32F2F);">清除标注</button>
+            </div>
+        </div>
+        
+        <!-- 标注功能说明 -->
+        <div style="text-align: center; margin: 15px 0; color: white; font-size: 0.9rem;">
+            💡 按住 Shift 键点击地图可添加标注点
+        </div>
+        
+        <!-- 新布局：地图在左，标注点在右 -->
+        <div class="layout-container">
+            <!-- 左侧地图区域 -->
+            <div class="map-section">
+                <div class="map-canvas-container">
+                    <canvas id="mapCanvas"></canvas>
+                    
+                    <!-- 地图图例 -->
+                    <div class="map-legend">
+                        <div class="legend-title">图例</div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff6b6b;"></div>
+                            <span>热门景点</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <span>自然风光</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #2196F3;"></div>
+                            <span>历史遗迹</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧标注点区域 -->
+            <div class="spots-section">
+                <h3>景点列表</h3>
+                <div class="spot-list" id="spotList">
+                    <!-- 景点列表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 景点信息面板 -->
+        <div class="spot-info-panel" id="spotInfoPanel" style="display: none;">
+            <h3 class="spot-info-title" id="spotInfoTitle">景点信息</h3>
+            <div class="spot-info-content" id="spotInfoContent"></div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+        
+        <div class="current-time" id="currentTime"></div>
+    </div>
+
+    <script>
+        // 地图相关变量
+        let mapZoom = 5;
+        let mapOffsetX = 0;
+        let mapOffsetY = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let canvas, ctx;
+        
+        // 乡村地图景点数据
+        const touristSpots = [
+            {
+                id: 'river1',
+                name: '清溪河',
+                description: '清溪河：蜿蜒穿过乡村的清澈河流，两岸绿树成荫，是垂钓和泛舟的好去处。',
+                type: '河流',
+                lat: 45,
+                lng: 45,
+                color: '#2196F3'
+            },
+            {
+                id: 'farm1',
+                name: '田园农舍',
+                description: '田园农舍：传统的乡村农舍，周围环绕着农田和果园，提供农家乐体验。',
+                type: '农舍',
+                lat: 40,
+                lng: 50,
+                color: '#8BC34A'
+            },
+            {
+                id: 'lake1',
+                name: '碧波湖',
+                description: '碧波湖：宁静的乡村湖泊，湖水清澈见底，是观鸟和休闲的好地方。',
+                type: '湖泊',
+                lat: 50,
+                lng: 40,
+                color: '#2196F3'
+            },
+            {
+                id: 'orchard1',
+                name: '果园',
+                description: '果园：种植各种水果的果园，春季赏花，秋季采摘，四季皆宜。',
+                type: '果园',
+                lat: 35,
+                lng: 55,
+                color: '#FF9800'
+            },
+            {
+                id: 'village1',
+                name: '古村落',
+                description: '古村落：保存完好的传统村落，石板路、老房子，充满历史韵味。',
+                type: '村落',
+                lat: 55,
+                lng: 35,
+                color: '#795548'
+            },
+            {
+                id: 'bridge1',
+                name: '石桥',
+                description: '石桥：古老的石拱桥，连接两岸，是乡村的标志性建筑。',
+                type: '桥梁',
+                lat: 42,
+                lng: 42,
+                color: '#607D8B'
+            },
+            {
+                id: 'field1',
+                name: '麦田',
+                description: '麦田：金黄色的麦田，风吹麦浪，展现乡村丰收的景象。',
+                type: '农田',
+                lat: 48,
+                lng: 48,
+                color: '#FFC107'
+            }
+        ];
+        
+        // 用户标注点数组
+        let userMarkers = [];
+        
+        // 时间更新函数
+        function updateTime() {
+            const now = new Date();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[now.getDay()];
+            
+            const fullDateString = `${year}年${month}月${day}日`;
+            const weekdayString = `星期${weekday}`;
+            
+            document.getElementById('currentTime').innerHTML = 
+                `当前时间：${timeString} | ${fullDateString} ${weekdayString}`;
+        }
+        
+        // 生成景点列表
+        function generateSpotList() {
+            const spotList = document.getElementById('spotList');
+            spotList.innerHTML = '';
+            
+            touristSpots.forEach((spot, index) => {
+                const spotItem = document.createElement('div');
+                spotItem.className = 'spot-item';
+                spotItem.innerHTML = `
+                    <div class="spot-name">${spot.name}</div>
+                    <div class="spot-type">类型：${spot.type}</div>
+                    <div class="spot-description">${spot.description}</div>
+                `;
+                
+                spotItem.addEventListener('click', () => {
+                    // 移除所有激活状态
+                    document.querySelectorAll('.spot-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // 添加当前激活状态
+                    spotItem.classList.add('active');
+                    
+                    // 显示景点信息
+                    showSpotInfo(spot);
+                    
+                    // 将地图中心移动到该景点
+                    const {x, y} = latLngToCanvas(spot.lat, spot.lng);
+                    mapOffsetX = canvas.width / 2 - x;
+                    mapOffsetY = canvas.height / 2 - y;
+                    mapZoom = 7; // 放大到更近的视图
+                    updateZoomLevel();
+                    renderMap();
+                });
+                
+                spotList.appendChild(spotItem);
+            });
+        }
+        
+        // 初始化地图
+        function initMap() {
+            canvas = document.getElementById('mapCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置画布尺寸
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // 加载用户标注点
+            loadUserMarkers();
+            
+            // 生成景点列表
+            generateSpotList();
+            
+            // 添加事件监听器
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', dragMap);
+            canvas.addEventListener('mouseup', stopDrag);
+            canvas.addEventListener('mouseleave', stopDrag);
+            canvas.addEventListener('wheel', handleZoom);
+            canvas.addEventListener('click', handleMapClick);
+            
+            // 初始渲染
+            renderMap();
+            
+            // 窗口大小变化时重新设置画布尺寸
+            window.addEventListener('resize', function() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                renderMap();
+            });
+        }
+        
+        // 清除所有用户标注点
+        function clearUserMarkers() {
+            if (userMarkers.length === 0) {
+                alert('当前没有用户标注点');
+                return;
+            }
+            
+            if (confirm('确定要清除所有用户标注点吗？此操作不可撤销。')) {
+                userMarkers = [];
+                localStorage.removeItem('userMarkers');
+                renderMap();
+                hideSpotInfo();
+                alert('所有用户标注点已清除');
+            }
+        }
+        
+        // 开始拖拽
+        function startDrag(e) {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        }
+        
+        // 拖拽地图
+        function dragMap(e) {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - lastMouseX;
+            const deltaY = e.clientY - lastMouseY;
+            
+            mapOffsetX += deltaX;
+            mapOffsetY += deltaY;
+            
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            
+            renderMap();
+        }
+        
+        // 停止拖拽
+        function stopDrag() {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        }
+        
+        // 处理缩放
+        function handleZoom(e) {
+            e.preventDefault();
+            
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            const oldZoom = mapZoom;
+            
+            mapZoom = Math.max(1, Math.min(10, mapZoom * zoomFactor));
+            
+            // 调整偏移量以保持缩放中心
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            mapOffsetX = mouseX - (mouseX - mapOffsetX) * (mapZoom / oldZoom);
+            mapOffsetY = mouseY - (mouseY - mapOffsetY) * (mapZoom / oldZoom);
+            
+            updateZoomLevel();
+            renderMap();
+        }
+        
+        // 放大
+        function zoomIn() {
+            mapZoom = Math.min(10, mapZoom + 1);
+            updateZoomLevel();
+            renderMap();
+        }
+        
+        // 缩小
+        function zoomOut() {
+            mapZoom = Math.max(1, mapZoom - 1);
+            updateZoomLevel();
+            renderMap();
+        }
+        
+        // 重置地图
+        function resetMap() {
+            mapZoom = 5;
+            mapOffsetX = 0;
+            mapOffsetY = 0;
+            updateZoomLevel();
+            renderMap();
+            hideSpotInfo();
+        }
+        
+        // 更新缩放级别显示
+        function updateZoomLevel() {
+            document.getElementById('zoomLevel').textContent = mapZoom + 'x';
+        }
+        
+        // 经纬度转换为画布坐标（乡村地图坐标系统）
+        function latLngToCanvas(lat, lng) {
+            // 乡村地图坐标系统（0-90纬度，0-90经度）
+            const centerLat = 45;
+            const centerLng = 45;
+            const scale = 800 / mapZoom;
+            
+            const x = (lng - centerLng) * scale + canvas.width / 2 + mapOffsetX;
+            const y = (centerLat - lat) * scale + canvas.height / 2 + mapOffsetY;
+            
+            return { x, y };
+        }
+        
+        // 渲染乡村地图
+        function renderMap() {
+            // 清除画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制天空背景
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#E0F7FA');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制远山
+            ctx.fillStyle = '#78909C';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height * 0.3);
+            ctx.lineTo(canvas.width * 0.2, canvas.height * 0.2);
+            ctx.lineTo(canvas.width * 0.4, canvas.height * 0.25);
+            ctx.lineTo(canvas.width * 0.6, canvas.height * 0.18);
+            ctx.lineTo(canvas.width * 0.8, canvas.height * 0.22);
+            ctx.lineTo(canvas.width, canvas.height * 0.3);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 绘制草地
+            const grassGradient = ctx.createLinearGradient(0, canvas.height * 0.3, 0, canvas.height);
+            grassGradient.addColorStop(0, '#7CB342');
+            grassGradient.addColorStop(1, '#558B2F');
+            ctx.fillStyle = grassGradient;
+            ctx.fillRect(0, canvas.height * 0.3, canvas.width, canvas.height * 0.7);
+            
+            // 绘制河流
+            ctx.strokeStyle = '#2196F3';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width * 0.1, canvas.height * 0.4);
+            ctx.bezierCurveTo(
+                canvas.width * 0.3, canvas.height * 0.35,
+                canvas.width * 0.5, canvas.height * 0.45,
+                canvas.width * 0.7, canvas.height * 0.4
+            );
+            ctx.bezierCurveTo(
+                canvas.width * 0.9, canvas.height * 0.35,
+                canvas.width * 0.8, canvas.height * 0.6,
+                canvas.width * 0.6, canvas.height * 0.65
+            );
+            ctx.stroke();
+            
+            // 绘制湖泊
+            ctx.fillStyle = '#29B6F6';
+            ctx.beginPath();
+            ctx.ellipse(canvas.width * 0.8, canvas.height * 0.5, 60, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制农田
+            drawFields();
+            
+            // 绘制农舍
+            drawFarmhouse(canvas.width * 0.4, canvas.height * 0.5);
+            drawFarmhouse(canvas.width * 0.6, canvas.height * 0.6);
+            
+            // 绘制石桥
+            drawBridge(canvas.width * 0.4, canvas.height * 0.45);
+            
+            // 绘制果园
+            drawOrchard(canvas.width * 0.3, canvas.height * 0.7);
+            
+            // 绘制景点标记
+            touristSpots.forEach(spot => {
+                const {x, y} = latLngToCanvas(spot.lat, spot.lng);
+                
+                // 检查点是否在可视范围内
+                if (x >= -20 && x <= canvas.width + 20 && y >= -20 && y <= canvas.height + 20) {
+                    // 绘制标记
+                    ctx.fillStyle = spot.color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 标记外圈
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // 景点名称
+                    ctx.fillStyle = '#333';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(spot.name, x, y - 15);
+                }
+            });
+            
+            // 绘制用户标注点
+            drawUserMarkers();
+        }
+        
+        // 绘制农田
+        function drawFields() {
+            // 麦田
+            ctx.fillStyle = '#FFD54F';
+            ctx.fillRect(canvas.width * 0.1, canvas.height * 0.6, 120, 80);
+            
+            // 蔬菜田
+            ctx.fillStyle = '#66BB6A';
+            ctx.fillRect(canvas.width * 0.2, canvas.height * 0.7, 100, 60);
+            
+            // 稻田
+            ctx.fillStyle = '#81C784';
+            ctx.fillRect(canvas.width * 0.5, canvas.height * 0.7, 150, 70);
+        }
+        
+        // 绘制农舍
+        function drawFarmhouse(x, y) {
+            // 房屋主体
+            ctx.fillStyle = '#8D6E63';
+            ctx.fillRect(x - 25, y - 30, 50, 30);
+            
+            // 屋顶
+            ctx.fillStyle = '#5D4037';
+            ctx.beginPath();
+            ctx.moveTo(x - 30, y - 30);
+            ctx.lineTo(x, y - 50);
+            ctx.lineTo(x + 30, y - 30);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 窗户
+            ctx.fillStyle = '#E3F2FD';
+            ctx.fillRect(x - 20, y - 25, 15, 10);
+            ctx.fillRect(x + 5, y - 25, 15, 10);
+            
+            // 门
+            ctx.fillStyle = '#5D4037';
+            ctx.fillRect(x - 5, y - 15, 10, 15);
+        }
+        
+        // 绘制石桥
+        function drawBridge(x, y) {
+            ctx.strokeStyle = '#78909C';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 40, y);
+            ctx.lineTo(x + 40, y);
+            ctx.stroke();
+            
+            // 桥墩
+            for (let i = -30; i <= 30; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(x + i, y);
+                ctx.lineTo(x + i, y + 10);
+                ctx.stroke();
+            }
+        }
+        
+        // 绘制果园
+        function drawOrchard(x, y) {
+            // 果树
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 2; j++) {
+                    const treeX = x + i * 40;
+                    const treeY = y + j * 30;
+                    
+                    // 树干
+                    ctx.fillStyle = '#5D4037';
+                    ctx.fillRect(treeX - 3, treeY, 6, 20);
+                    
+                    // 树冠
+                    ctx.fillStyle = '#388E3C';
+                    ctx.beginPath();
+                    ctx.arc(treeX, treeY - 10, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        
+        // 绘制用户标注点
+        function drawUserMarkers() {
+            userMarkers.forEach(marker => {
+                const {x, y} = latLngToCanvas(marker.lat, marker.lng);
+                
+                // 检查点是否在可视范围内
+                if (x >= -20 && x <= canvas.width + 20 && y >= -20 && y <= canvas.height + 20) {
+                    // 绘制自定义标记（红色五角星）
+                    ctx.fillStyle = '#FF5252';
+                    drawStar(ctx, x, y, 10, 5, 3);
+                    
+                    // 标记外圈
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // 标注名称
+                    ctx.fillStyle = '#333';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(marker.name, x, y - 20);
+                }
+            });
+        }
+        
+        // 绘制五角星
+        function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // 绘制河流
+        function drawRiver(points) {
+            ctx.beginPath();
+            points.forEach((point, index) => {
+                const {x, y} = latLngToCanvas(point.lat, point.lng);
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+        }
+        
+        // 处理地图点击
+        function handleMapClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // 检查是否点击了景点标记
+            touristSpots.forEach(spot => {
+                const {x, y} = latLngToCanvas(spot.lat, spot.lng);
+                const distance = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+                
+                if (distance <= 15) {
+                    showSpotInfo(spot);
+                    return;
+                }
+            });
+            
+            // 检查是否点击了用户标注点
+            userMarkers.forEach(marker => {
+                const {x, y} = latLngToCanvas(marker.lat, marker.lng);
+                const distance = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+                
+                if (distance <= 15) {
+                    showUserMarkerInfo(marker);
+                    return;
+                }
+            });
+            
+            // 如果不是点击标记，则添加新标注点
+            if (e.shiftKey) {
+                addUserMarker(mouseX, mouseY);
+            }
+        }
+        
+        // 添加用户标注点
+        function addUserMarker(x, y) {
+            const markerName = prompt('请输入标注点名称：');
+            if (!markerName) return;
+            
+            const markerDescription = prompt('请输入标注点描述：');
+            
+            // 将画布坐标转换为经纬度
+            const {lat, lng} = canvasToLatLng(x, y);
+            
+            const newMarker = {
+                id: 'marker_' + Date.now(),
+                name: markerName,
+                description: markerDescription || '用户自定义标注点',
+                type: '自定义标注',
+                lat: lat,
+                lng: lng,
+                color: '#FF5252',
+                timestamp: new Date().toLocaleString()
+            };
+            
+            userMarkers.push(newMarker);
+            renderMap();
+            
+            // 保存到localStorage
+            saveUserMarkers();
+        }
+        
+        // 画布坐标转换为经纬度
+        function canvasToLatLng(x, y) {
+            const centerLat = 45;
+            const centerLng = 45;
+            const scale = 800 / mapZoom;
+            
+            const lng = (x - canvas.width / 2 - mapOffsetX) / scale + centerLng;
+            const lat = centerLat - (y - canvas.height / 2 - mapOffsetY) / scale;
+            
+            return { lat, lng };
+        }
+        
+        // 显示用户标注点信息
+        function showUserMarkerInfo(marker) {
+            document.getElementById('spotInfoTitle').textContent = marker.name;
+            document.getElementById('spotInfoContent').innerHTML = `
+                <p><strong>类型：</strong>${marker.type}</p>
+                <p><strong>描述：</strong>${marker.description}</p>
+                <p><strong>位置：</strong>纬度 ${marker.lat.toFixed(4)}°，经度 ${marker.lng.toFixed(4)}°</p>
+                <p><strong>创建时间：</strong>${marker.timestamp}</p>
+                <button class="search-btn" onclick="deleteMarker('${marker.id}')" style="margin-top: 10px;">删除标注</button>
+            `;
+            document.getElementById('spotInfoPanel').style.display = 'block';
+        }
+        
+        // 删除标注点
+        function deleteMarker(markerId) {
+            if (confirm('确定要删除这个标注点吗？')) {
+                userMarkers = userMarkers.filter(marker => marker.id !== markerId);
+                renderMap();
+                hideSpotInfo();
+                saveUserMarkers();
+            }
+        }
+        
+        // 保存用户标注点到localStorage
+        function saveUserMarkers() {
+            localStorage.setItem('userMarkers', JSON.stringify(userMarkers));
+        }
+        
+        // 从localStorage加载用户标注点
+        function loadUserMarkers() {
+            const savedMarkers = localStorage.getItem('userMarkers');
+            if (savedMarkers) {
+                userMarkers = JSON.parse(savedMarkers);
+            }
+        }
+        
+        // 显示景点信息
+        function showSpotInfo(spot) {
+            document.getElementById('spotInfoTitle').textContent = spot.name;
+            document.getElementById('spotInfoContent').innerHTML = `
+                <p><strong>类型：</strong>${spot.type}</p>
+                <p><strong>描述：</strong>${spot.description}</p>
+                <p><strong>位置：</strong>纬度 ${spot.lat}°，经度 ${spot.lng}°</p>
+            `;
+            document.getElementById('spotInfoPanel').style.display = 'block';
+        }
+        
+        // 隐藏景点信息
+        function hideSpotInfo() {
+            document.getElementById('spotInfoPanel').style.display = 'none';
+        }
+        
+        // 搜索景点
+        function searchSpot() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (!searchTerm) {
+                alert('请输入搜索关键词');
+                return;
+            }
+            
+            const foundSpots = touristSpots.filter(spot => 
+                spot.name.toLowerCase().includes(searchTerm) || 
+                spot.type.toLowerCase().includes(searchTerm)
+            );
+            
+            if (foundSpots.length === 0) {
+                alert('未找到相关景点');
+                return;
+            }
+            
+            // 显示第一个匹配的景点
+            const spot = foundSpots[0];
+            showSpotInfo(spot);
+            
+            // 将地图中心移动到该景点
+            const {x, y} = latLngToCanvas(spot.lat, spot.lng);
+            mapOffsetX = canvas.width / 2 - x;
+            mapOffsetY = canvas.height / 2 - y;
+            mapZoom = 7; // 放大到更近的视图
+            updateZoomLevel();
+            renderMap();
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('userType');
+            window.location.href = 'index.html';
+        }
+        
+        // 添加角色菜单按钮
+        function addRoleMenuButton(userType) {
+            const mapControls = document.querySelector('.map-controls');
+            
+            // 创建菜单按钮
+            const menuButton = document.createElement('button');
+            menuButton.className = 'search-btn';
+            menuButton.style.marginLeft = '15px';
+            
+            // 根据用户类型设置按钮文本和功能
+            if (userType === 'village') {
+                menuButton.textContent = '村委管理菜单';
+                menuButton.onclick = showVillageMenu;
+            } else if (userType === 'cooperative') {
+                menuButton.textContent = '合作社管理菜单';
+                menuButton.onclick = showCooperativeMenu;
+            } else if (userType === 'enterprise') {
+                menuButton.textContent = '企业管理菜单';
+                menuButton.onclick = showEnterpriseMenu;
+            }
+            
+            // 将按钮添加到控制面板
+            mapControls.appendChild(menuButton);
+        }
+        
+        // 合作社专属菜单功能
+        function showCooperativeMenu() {
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">合作社管理平台</h2>
+                
+                <div class="cooperative-menu">
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="publishResource()">
+                            <div class="menu-icon">📦</div>
+                            <h3>发布资源信息</h3>
+                            <p>发布农产品、民宿、旅游设施等资源信息</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="publishSkill()">
+                            <div class="menu-icon">🔧</div>
+                            <h3>发布技能信息</h3>
+                            <p>发布导游、手工艺、特色服务等技能信息</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="browseSearch()">
+                            <div class="menu-icon">🔍</div>
+                            <h3>浏览和搜索</h3>
+                            <p>查看和搜索已发布的资源和技能信息</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+        }
+        
+        // 村委专属菜单功能
+        function showVillageMenu() {
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">村委管理平台</h2>
+                
+                <div class="cooperative-menu">
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="showStatistics()">
+                            <div class="menu-icon">📊</div>
+                            <h3>数据统计</h3>
+                            <p>查看乡村旅游数据统计、游客流量分析、收入统计等</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showResourceManagement()">
+                            <div class="menu-icon">🏘️</div>
+                            <h3>资源管理</h3>
+                            <p>管理乡村资源、民宿信息、景点设施等</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showVillagePlanning()">
+                            <div class="menu-icon">🗺️</div>
+                            <h3>乡村规划</h3>
+                            <p>制定乡村旅游发展规划、基础设施建设规划</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showPolicyManagement()">
+                            <div class="menu-icon">📜</div>
+                            <h3>政策管理</h3>
+                            <p>发布乡村旅游政策、管理办法、通知公告</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+        }
+        
+        // 旅游企业专属菜单功能
+        function showEnterpriseMenu() {
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">旅游企业管理平台</h2>
+                
+                <div class="cooperative-menu">
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="publishRequirement()">
+                            <div class="menu-icon">📋</div>
+                            <h3>发布需求信息</h3>
+                            <p>发布旅游产品需求、服务需求、合作需求等信息</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="publishJob()">
+                            <div class="menu-icon">💼</div>
+                            <h3>发布岗位信息</h3>
+                            <p>发布导游、客服、运营、管理等岗位招聘信息</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="browseEnterpriseInfo()">
+                            <div class="menu-icon">🔍</div>
+                            <h3>浏览企业信息</h3>
+                            <p>查看和搜索已发布的需求和岗位信息</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+        }
+        
+        // 发布资源信息
+        function publishResource() {
+            const resourceInfo = prompt('请输入要发布的资源信息（农产品、民宿、旅游设施等）：');
+            if (resourceInfo) {
+                alert('资源信息发布成功！发布内容：' + resourceInfo);
+            }
+        }
+        
+        // 发布技能信息
+        function publishSkill() {
+            const skillInfo = prompt('请输入要发布的技能信息（导游、手工艺、特色服务等）：');
+            if (skillInfo) {
+                alert('技能信息发布成功！发布内容：' + skillInfo);
+            }
+        }
+        
+        // 浏览和搜索
+        function browseSearch() {
+            const searchTerm = prompt('请输入搜索关键词：');
+            if (searchTerm) {
+                alert(`正在搜索：${searchTerm}
+
+搜索结果：
+• 农产品：有机蔬菜、土鸡蛋
+• 民宿：乡村民宿、特色农家院
+• 技能：传统手工艺、导游服务`);
+            }
+        }
+        
+        // 发布需求信息
+        function publishRequirement() {
+            const requirementInfo = prompt('请输入要发布的旅游需求信息（旅游产品需求、服务需求、合作需求等）：');
+            if (requirementInfo) {
+                // 保存到localStorage
+                const requirements = JSON.parse(localStorage.getItem('enterpriseRequirements') || '[]');
+                const username = localStorage.getItem('username');
+                const newRequirement = {
+                    id: Date.now(),
+                    content: requirementInfo,
+                    publisher: username,
+                    timestamp: new Date().toLocaleString(),
+                    type: 'requirement'
+                };
+                requirements.push(newRequirement);
+                localStorage.setItem('enterpriseRequirements', JSON.stringify(requirements));
+                alert('需求信息发布成功！发布内容：' + requirementInfo);
+            }
+        }
+        
+        // 发布岗位信息
+        function publishJob() {
+            const jobInfo = prompt('请输入要发布的岗位信息（岗位名称、要求、薪资等）：');
+            if (jobInfo) {
+                // 保存到localStorage
+                const jobs = JSON.parse(localStorage.getItem('enterpriseJobs') || '[]');
+                const username = localStorage.getItem('username');
+                const newJob = {
+                    id: Date.now(),
+                    content: jobInfo,
+                    publisher: username,
+                    timestamp: new Date().toLocaleString(),
+                    type: 'job'
+                };
+                jobs.push(newJob);
+                localStorage.setItem('enterpriseJobs', JSON.stringify(jobs));
+                alert('岗位信息发布成功！发布内容：' + jobInfo);
+            }
+        }
+        
+        // 浏览企业信息
+        function browseEnterpriseInfo() {
+            const searchTerm = prompt('请输入搜索关键词（需求/岗位）：');
+            if (searchTerm) {
+                const requirements = JSON.parse(localStorage.getItem('enterpriseRequirements') || '[]');
+                const jobs = JSON.parse(localStorage.getItem('enterpriseJobs') || '[]');
+                
+                let result = `正在搜索：${searchTerm}
+
+`;
+                
+                // 搜索需求信息
+                const matchedRequirements = requirements.filter(req => 
+                    req.content.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                if (matchedRequirements.length > 0) {
+                    result += '需求信息：';
+                    matchedRequirements.forEach(req => {
+                        result += `• ${req.content} (发布者：${req.publisher}, 时间：${req.timestamp})
+`;
+                    });
+                }
+                
+                // 搜索岗位信息
+                const matchedJobs = jobs.filter(job => 
+                    job.content.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                if (matchedJobs.length > 0) {
+                    result += '岗位信息：';
+                    matchedJobs.forEach(job => {
+                        result += `• ${job.content} (发布者：${job.publisher}, 时间：${job.timestamp})
+`;
+                    });
+                }
+                
+                if (matchedRequirements.length === 0 && matchedJobs.length === 0) {
+                    result += '未找到相关信息';
+                }
+                
+                alert(result);
+            }
+        }
+        
+        // 村委统计功能
+        function showStatistics() {
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">乡村旅游数据统计</h2>
+                
+                <div class="cooperative-menu">
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="showVisitorStatistics()">
+                            <div class="menu-icon">👥</div>
+                            <h3>游客流量统计</h3>
+                            <p>查看月度游客数量、游客来源地分析、游客停留时间统计</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showIncomeStatistics()">
+                            <div class="menu-icon">💰</div>
+                            <h3>收入统计</h3>
+                            <p>查看旅游收入、民宿收入、农产品销售等收入统计</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showResourceStatistics()">
+                            <div class="menu-icon">🏡</div>
+                            <h3>资源利用统计</h3>
+                            <p>查看民宿入住率、景点访问量、设施使用率统计</p>
+                        </div>
+                        
+                        <div class="menu-item" onclick="showDevelopmentStatistics()">
+                            <div class="menu-icon">📈</div>
+                            <h3>发展指标统计</h3>
+                            <p>查看乡村旅游发展指标、满意度调查、投资回报分析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="search-btn" onclick="showVillageMenu()" style="margin-right: 15px;">返回菜单</button>
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+            
+            // 更新时间
+            updateTime();
+        }
+        
+        // 游客流量统计
+        function showVisitorStatistics() {
+            const statistics = generateVisitorStatistics();
+            
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">游客流量统计</h2>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin: 20px 0;">
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">月度游客统计</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #4CAF50; font-weight: bold;">${statistics.totalVisitors}</div>
+                            <div style="color: white;">总游客数</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #2196F3; font-weight: bold;">${statistics.monthlyGrowth}%</div>
+                            <div style="color: white;">月度增长率</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #FF9800; font-weight: bold;">${statistics.averageStay}</div>
+                            <div style="color: white;">平均停留天数</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin: 20px 0;">
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">游客来源地分布</h3>
+                    <div style="color: white; line-height: 1.8;">
+                        ${statistics.visitorOrigins.map(origin => 
+                            `<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>${origin.region}</span>
+                                <span>${origin.percentage}% (${origin.count}人)</span>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="search-btn" onclick="showStatistics()" style="margin-right: 15px;">返回统计</button>
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+            
+            // 更新时间
+            updateTime();
+        }
+        
+        // 生成游客统计数据的函数
+        function generateVisitorStatistics() {
+            return {
+                totalVisitors: Math.floor(Math.random() * 5000) + 1000,
+                monthlyGrowth: (Math.random() * 20 + 5).toFixed(1),
+                averageStay: (Math.random() * 3 + 2).toFixed(1),
+                visitorOrigins: [
+                    { region: '本地游客', percentage: 35, count: Math.floor(Math.random() * 1000) + 500 },
+                    { region: '省内游客', percentage: 25, count: Math.floor(Math.random() * 800) + 300 },
+                    { region: '省外游客', percentage: 30, count: Math.floor(Math.random() * 900) + 400 },
+                    { region: '国际游客', percentage: 10, count: Math.floor(Math.random() * 300) + 100 }
+                ]
+            };
+        }
+        
+        // 收入统计
+        function showIncomeStatistics() {
+            const statistics = generateIncomeStatistics();
+            
+            document.querySelector('.map-container').innerHTML = `
+                <h2 class="map-title">收入统计</h2>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin: 20px 0;">
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">月度收入统计（万元）</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #4CAF50; font-weight: bold;">${statistics.totalIncome}</div>
+                            <div style="color: white;">总收入</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #2196F3; font-weight: bold;">${statistics.tourismIncome}</div>
+                            <div style="color: white;">旅游收入</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; color: #FF9800; font-weight: bold;">${statistics.accommodationIncome}</div>
+                            <div style="color: white;">民宿收入</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 30px; margin: 20px 0;">
+                    <h3 style="color: white; text-align: center; margin-bottom: 20px;">收入构成分析</h3>
+                    <div style="color: white; line-height: 1.8;">
+                        ${statistics.incomeBreakdown.map(item => 
+                            `<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>${item.category}</span>
+                                <span>${item.amount}万元 (${item.percentage}%)</span>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="search-btn" onclick="showStatistics()" style="margin-right: 15px;">返回统计</button>
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            `;
+            
+            // 更新时间
+            updateTime();
+        }
+        
+        // 生成收入统计数据的函数
+        function generateIncomeStatistics() {
+            const tourismIncome = (Math.random() * 50 + 20).toFixed(1);
+            const accommodationIncome = (Math.random() * 30 + 10).toFixed(1);
+            const productIncome = (Math.random() * 20 + 5).toFixed(1);
+            const totalIncome = (parseFloat(tourismIncome) + parseFloat(accommodationIncome) + parseFloat(productIncome)).toFixed(1);
+            
+            return {
+                totalIncome: totalIncome,
+                tourismIncome: tourismIncome,
+                accommodationIncome: accommodationIncome,
+                incomeBreakdown: [
+                    { category: '旅游门票收入', amount: tourismIncome, percentage: ((parseFloat(tourismIncome) / parseFloat(totalIncome)) * 100).toFixed(1) },
+                    { category: '民宿住宿收入', amount: accommodationIncome, percentage: ((parseFloat(accommodationIncome) / parseFloat(totalIncome)) * 100).toFixed(1) },
+                    { category: '农产品销售', amount: productIncome, percentage: ((parseFloat(productIncome) / parseFloat(totalIncome)) * 100).toFixed(1) }
+                ]
+            };
+        }
+        
+        // 资源管理功能
+        function showResourceManagement() {
+            alert('资源管理功能开发中...功能包括：• 民宿资源管理• 景点设施管理• 农产品资源管理• 人力资源统计');
+        }
+        
+        // 乡村规划功能
+        function showVillagePlanning() {
+            alert('乡村规划功能开发中...功能包括：• 旅游发展规划• 基础设施建设规划• 环境保护规划• 产业发展规划');
+        }
+        
+        // 政策管理功能
+        function showPolicyManagement() {
+            alert('政策管理功能开发中...功能包括：• 政策发布管理• 管理办法制定• 通知公告发布• 政策效果评估');
+        }
+        
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username');
+            const userType = localStorage.getItem('userType');
+            
+            if (!isLoggedIn || isLoggedIn !== 'true' || !username) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // 根据用户类型显示不同界面
+            if (userType === 'village') {
+                document.getElementById('welcomeText').textContent = `欢迎村委管理员 ${username}！`;
+                initMap();
+                // 添加村委菜单按钮
+                addRoleMenuButton('village');
+            } else if (userType === 'cooperative') {
+                document.getElementById('welcomeText').textContent = `欢迎合作社管理员 ${username}！`;
+                initMap();
+                // 添加合作社菜单按钮
+                addRoleMenuButton('cooperative');
+            } else if (userType === 'enterprise') {
+                document.getElementById('welcomeText').textContent = `欢迎旅游企业管理员 ${username}！`;
+                initMap();
+                // 添加旅游企业菜单按钮
+                addRoleMenuButton('enterprise');
+            } else {
+                document.getElementById('welcomeText').textContent = `欢迎回来，${username}！开始探索精彩世界`;
+                initMap();
+            }
+            
+            // 更新时间
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+    </script>
+</body>
+</html>
